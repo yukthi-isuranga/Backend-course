@@ -1,5 +1,6 @@
 import { prisma } from '../config/db.js';
 import bcrypt from 'bcrypt';
+import generateToken from '../utils/generateToken.js';
 
 const register = async (req, res) => {
   const body = req.body;
@@ -26,9 +27,12 @@ const register = async (req, res) => {
   });
 
   //   res.json({ message: 'User registered successfully', body });
+
+  //JWT token generation
+  const token = generateToken(newUser.id, res);
   res
     .status(201)
-    .json({ status: 'User registered successfully', user: newUser });
+    .json({ status: 'User registered successfully', user: newUser, token });
 };
 
 const login = async (req, res) => {
@@ -49,7 +53,24 @@ const login = async (req, res) => {
     return res.status(400).json({ message: 'Invalid email or password xxxxx' });
   }
 
+  //JWT token generation
+
+  const token = generateToken(existingUser.id, res);
+
   // If login is successful, you can generate a token or set a session here
-  res.json({ message: 'Login successful', user: existingUser });
+  //   res.json({ message: 'Login successful', user: existingUser });
+  res
+    .status(200)
+    .json({ status: 'Login successful', user: existingUser, token });
 };
-export { register, login };
+
+//Logout function to clear the JWT token cookie
+const logout = async (req, res) => {
+  res.clearCookie('jwtToken', '', {
+    httpOnly: true,
+    expires: new Date(0), // Set the cookie to expire immediately
+  });
+  res.status(200).json({ status: 'success', message: 'Logout successful' });
+};
+
+export { register, login, logout };
