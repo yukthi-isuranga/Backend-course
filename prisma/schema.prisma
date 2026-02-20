@@ -1,0 +1,70 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+//User -> Movie (Many to Many) -> WatchList
+
+// Define the User model
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique // Ensure email is unique
+  password  String
+  createdAt DateTime @default(now())
+
+  // Define the relation to WatchList and Movie
+  watchLists WatchList[]
+  movies     Movie[]
+}
+
+// Define the Movie model
+model Movie {
+  id          String   @id @default(uuid())
+  title       String
+  overview    String?
+  releaseYear Int
+  genres      String[] @default([])
+  runtime     Int?
+  posterUrl   String?
+  createdBy   String
+  createdAt   DateTime @default(now())
+
+  // Define the relation to WatchList and User
+  watchLists WatchList[]
+  creator    User        @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+}
+
+// Define the WatchList model to represent the many-to-many relationship between User and Movie
+model WatchList {
+  id        String          @id @default(uuid())
+  userId    String
+  movieId   String
+  status    WatchListStatus @default(PLANNED) // Enum to represent the status of the watchlist item
+  rating    Int? // Optional rating for the movie
+  notes     String? // Optional notes for the movie
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  // Define the relations to User and Movie
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+}
+
+// Enum to represent the status of the watchlist item
+enum WatchListStatus {
+  PLANNED
+  WATCHING
+  COMPLETED
+  DROPPED
+}
