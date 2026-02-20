@@ -4,7 +4,7 @@ import { connectToDatabase, disconnectFromDatabase } from './config/db.js';
 
 // Importing movie routes
 import movieRoutes from './routes/movieRoutes.js';
-import authRoutes from './authRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 
 config(); // Load environment variables from .env file
 connectToDatabase(); // Connect to the database
