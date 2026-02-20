@@ -30,4 +30,26 @@ const register = async (req, res) => {
     .status(201)
     .json({ status: 'User registered successfully', user: newUser });
 };
-export { register };
+
+const login = async (req, res) => {
+  const body = req.body;
+  const { email, password } = body;
+
+  // check if user exists
+  const existingUser = await prisma.user.findUnique({
+    where: { email },
+  });
+  if (!existingUser) {
+    return res.status(400).json({ message: 'Invalid email or password' });
+  }
+
+  // Compare the provided password with the hashed password in the database
+  const isPasswordValid = await bcrypt.compare(password, existingUser.password);
+  if (!isPasswordValid) {
+    return res.status(400).json({ message: 'Invalid email or password xxxxx' });
+  }
+
+  // If login is successful, you can generate a token or set a session here
+  res.json({ message: 'Login successful', user: existingUser });
+};
+export { register, login };

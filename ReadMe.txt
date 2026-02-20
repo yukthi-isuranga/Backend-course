@@ -15,3 +15,7 @@ npm i dotenv
 npx prisma migrate dev --name add_users_table
 
 npx prisma generate
+
+npm i bcrypt
+
+npm i jsonwebtoken
