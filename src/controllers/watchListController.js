@@ -2,7 +2,9 @@ import { prisma } from '../config/db.js';
 
 const addToWatchList = async (req, res) => {
   //   console.log('Received request body:', req.body); // Log the incoming request body
-  const { movieId, status, rating, notes, userId } = await req.body;
+  const { movieId, status, rating, notes } = await req.body;
+
+  const userId = req.user.id; // Get the user ID from the authenticated user
 
   //veryfy if the movieId is valid and exists in the database
   const movie = await prisma.movie.findUnique({
