@@ -44,4 +44,29 @@ const addToWatchList = async (req, res) => {
     .json({ message: 'Movie added to watch list', watchListEntry });
 };
 
-export { addToWatchList };
+// Delete a movie from the watch list
+const removeFromWatchList = async (req, res) => {
+  const { id } = req.params; // Get the watch list entry ID from the URL parameters
+  const userId = req.user.id; // Get the user ID from the authenticated user
+  // Check if the watch list entry exists and belongs to the user
+  const watchListEntry = await prisma.watchList.findUnique({
+    where: { id },
+  });
+  if (!watchListEntry || watchListEntry.userId !== userId) {
+    return res.status(404).json({ error: 'Watch list entry not found' });
+  }
+
+  // ensure only the owner of the watch list entry can delete it
+  if (watchListEntry.userId !== userId) {
+    return res.status(403).json({
+      error: 'Forbidden, You can only delete your own watch list entries',
+    });
+  }
+
+  await prisma.watchList.delete({
+    where: { id },
+  });
+  res.json({ message: 'Movie removed from watch list' });
+};
+
+export { addToWatchList, removeFromWatchList };
