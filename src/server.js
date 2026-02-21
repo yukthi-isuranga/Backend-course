@@ -5,6 +5,7 @@ import { connectToDatabase, disconnectFromDatabase } from './config/db.js';
 // Importing movie routes
 import movieRoutes from './routes/movieRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import watchListRoutes from './routes/watchListRoutes.js';
 
 config(); // Load environment variables from .env file
 connectToDatabase(); // Connect to the database
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ extended: true })); // Middleware to parse URL-enco
 //API routes
 app.use('/movies', movieRoutes);
 app.use('/auth', authRoutes);
+app.use('/watchlist', watchListRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Hello, World!xxxx...222xxxx' });
