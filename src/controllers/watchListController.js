@@ -69,4 +69,37 @@ const removeFromWatchList = async (req, res) => {
   res.json({ message: 'Movie removed from watch list' });
 };
 
-export { addToWatchList, removeFromWatchList };
+// Update a watch list entry (e.g., change status, rating, or notes)
+const updateWatchListItem = async (req, res) => {
+  const { id } = req.params; // Get the watch list entry ID from the URL parameters
+  const { status, rating, notes } = req.body; // Get the updated fields from the request body
+  const userId = req.user.id; // Get the user ID from the authenticated user
+
+  // Check if the watch list entry exists and belongs to the user
+  const watchListEntry = await prisma.watchList.findUnique({
+    where: { id },
+  });
+  if (!watchListEntry || watchListEntry.userId !== userId) {
+    return res.status(404).json({ error: 'Watch list entry not found' });
+  }
+
+  // ensure only the owner of the watch list entry can update it
+  if (watchListEntry.userId !== userId) {
+    return res.status(403).json({
+      error: 'Forbidden, You can only update your own watch list entries',
+    });
+  }
+
+  const updatedEntry = await prisma.watchList.update({
+    where: { id },
+    data: {
+      status,
+      rating,
+      notes,
+    },
+  });
+
+  res.json({ message: 'Watch list entry updated', updatedEntry });
+};
+
+export { addToWatchList, removeFromWatchList, updateWatchListItem };
