@@ -19,3 +19,5 @@ npx prisma generate
 npm i bcrypt
 
 npm i jsonwebtoken
+
+npm i zod
